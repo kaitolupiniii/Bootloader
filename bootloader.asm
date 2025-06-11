@@ -3,9 +3,31 @@
     mov ds, ax      ; Set data segment to 0
     mov es, ax      ; Set extra segment to 0
     mov si, msg     ; Set si to point to the message
-    call print      ; Call print function
+    call main     ; Call print function
     jmp $           ; Infinite loop
 
+main:
+	mov ax, 0x07C0  ; Set up data segment
+	mov ds, ax
+	mov es, ax
+	
+	mov si, hello_msg   ; Print a welcome message
+	call print_string
+	
+	mov si, prompt_msg  ; Print a prompt message
+	call print_string
+	
+	call read_char	  ; Read a character from keyboard
+	
+	mov si, newline	 ; Move cursor to the next line
+	call print_string
+	
+	mov si, echo_msg	; Print the character that was entered
+	call print_string
+	
+	call print_char	 ; Print the character
+	
+	jmp $
 print:
     lodsb           ; Load character from si into al
     or al, al       ; Check for null terminator
