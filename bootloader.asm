@@ -28,18 +28,37 @@ main:
 	call print_char	 ; Print the character
 	
 	jmp $
-print:
-    lodsb           ; Load character from si into al
-    or al, al       ; Check for null terminator
-    jz done         ; If null terminator, jump to done
-    mov ah, 0x0e    ; Set teletype mode
-    int 0x10        ; Call BIOS interrupt to print character
-    jmp print       ; Loop back to print next character
-done:
-    ret
+print_string:
+	lodsb			   ; Load the next characterMore actions
+	or al, al		   ; Check for null terminator
+	jz end_print_string ; If null, end of string
+	
+	call print_char	 ; Print the character
+	jmp print_string	; Repeat for the next character
+	
+end_print_string:
+	ret
 
-msg:
-    db "Hello, World!", 0 ; Null-terminated message string
+; Print a character in AL
+print_char:
+	mov ah, 0x0E		; BIOS teletype function
+	int 0x10			; Call BIOS interrupt
+	
+	ret
+
+; Read a character from the keyboard
+read_char:
+	mov ah, 0		   ; BIOS keyboard input function
+	int 0x16			; Call BIOS interrupt
+	
+	ret
+
+; Data section
+
+hello_msg db "Welcome to My Bootloader!", 0
+prompt_msg db "Enter a character: ", 0
+echo_msg db "You entered: ", 0
+newline db 0x0D, 0x0A, 0
 
 times 510-($-$$) db 0 ; Fill the rest of the sector with 0s
 dw 0xaa55 ; Boot signature
